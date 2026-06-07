@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
+  <script>
+    const CONFIG = {
+      blogUrl: 'https://incomedraft.blogspot.com',
+      blogName: 'Income Draft',
+      itemsPerPage: 9,
+      themeColor: '#0f172a',
+    };
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Income Draft</title>
@@ -52,7 +60,7 @@
       var slug = (path.match(/\/([^/]+)\.html$/) || [])[1] || path.split('/').pop();
       if (!slug) { window.location.replace('/'); return; }
 
-      var $B = 'https://incomedraft.blogspot.com';
+      var $B = CONFIG.blogUrl;
       var cb = 'rd' + Math.random().toString(36).slice(2);
       var s = document.createElement('script');
       window[cb] = function(d) {
@@ -404,7 +412,7 @@
   </button>
 
   <script>
-    const BLOG_URL = 'https://incomedraft.blogspot.com';
+    const BLOG_URL = CONFIG.blogUrl;
 
     function jsonp(url) {
       return new Promise((resolve, reject) => {
@@ -434,8 +442,8 @@
 
     function app() {
       return {
-        blogName: 'Income Draft',
-        blogUrl: BLOG_URL,
+        blogName: CONFIG.blogName,
+        blogUrl: CONFIG.blogUrl,
         view: 'home',
         viewLabel: '',
         posts: [],
@@ -452,7 +460,7 @@
         allLabels: [],
         currentPage: 1,
         totalResults: 0,
-        itemsPerPage: 9,
+        itemsPerPage: CONFIG.itemsPerPage,
         mobileMenu: false,
         scrolled: false,
 
