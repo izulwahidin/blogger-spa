@@ -38,6 +38,40 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>
+    (function() {
+      var path = window.location.pathname.replace(/\/+$/, '') || '/';
+      var hash = window.location.hash;
+      if (path === '/' || hash.startsWith('#/')) return;
+
+      // Label URL → redirect directly
+      var lm = path.match(/\/search\/label\/(.+)/);
+      if (lm) { window.location.replace('/#/label/' + encodeURIComponent(decodeURIComponent(lm[1]))); return; }
+
+      var isPage = path.startsWith('/p/');
+      var slug = (path.match(/\/([^/]+)\.html$/) || [])[1] || path.split('/').pop();
+      if (!slug) { window.location.replace('/'); return; }
+
+      var $B = 'https://incomedraft.blogspot.com';
+      var cb = 'rd' + Math.random().toString(36).slice(2);
+      var s = document.createElement('script');
+      window[cb] = function(d) {
+        try {
+          var e = d.feed && d.feed.entry && d.feed.entry[0];
+          if (e) {
+            var id = (e.id.$t || '').match(/(?:post|page)-(\d+)/);
+            id = id ? id[1] : '';
+            var t = (e.title.$t || slug).toLowerCase().replace(/[^\w\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+            window.location.replace('/#/' + (isPage?'page':'post') + '/' + (t||slug) + '/' + id);
+          } else { window.location.replace('/'); }
+        } catch(_) { window.location.replace('/'); }
+        delete window[cb]; if(s.parentNode) s.parentNode.removeChild(s);
+      };
+      s.onerror = function() { window.location.replace('/'); delete window[cb]; if(s.parentNode)s.parentNode.removeChild(s); };
+      s.src = $B + '/feeds/posts/default?alt=json-in-script&max-results=1&q=' + encodeURIComponent(slug.replace(/-/g,' ')) + '&callback=' + cb;
+      document.head.appendChild(s);
+    })();
+  </script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 
   <style>
