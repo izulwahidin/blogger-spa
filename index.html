@@ -258,9 +258,9 @@
 
         <template x-if="allLabels.length > 0">
           <div class="flex flex-wrap gap-2 justify-center mb-10">
-            <button @click="currentLabel = ''; fetchPosts()" :class="currentLabel === '' ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-slate-900 font-medium shadow-lg shadow-emerald-500/20' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700/80 hover:text-white'" class="tag-pill px-4 py-1.5 text-sm rounded-full">All</button>
+            <a href="#" @click="navigateLabel($event, '', true)" :class="currentLabel === '' ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-slate-900 font-medium shadow-lg shadow-emerald-500/20' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700/80 hover:text-white'" class="tag-pill px-4 py-1.5 text-sm rounded-full no-underline">All</a>
             <template x-for="l in allLabels" :key="l[0]">
-              <button @click="currentLabel = l[0]; fetchByLabel(l[0])" :class="currentLabel === l[0] ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-slate-900 font-medium shadow-lg shadow-emerald-500/20' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700/80 hover:text-white'" class="tag-pill px-4 py-1.5 text-sm rounded-full" x-text="l[0] + ' (' + l[1] + ')'"></button>
+              <a :href="'#/label/' + l[0]" @click="navigateLabel($event, l[0])" :class="currentLabel === l[0] ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-slate-900 font-medium shadow-lg shadow-emerald-500/20' : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700/80 hover:text-white'" class="tag-pill px-4 py-1.5 text-sm rounded-full no-underline" x-text="l[0] + ' (' + l[1] + ')'"></a>
             </template>
           </div>
         </template>
@@ -821,9 +821,10 @@
           }
         },
 
-        navigateLabel(e, label) {
+        navigateLabel(e, label, all) {
           if (e.metaKey || e.ctrlKey || e.button === 1) return;
           e.preventDefault();
+          if (all) { this.currentLabel = ''; this.fetchPosts(); return; }
           this.currentLabel = label;
           this.fetchByLabel(label);
         },
