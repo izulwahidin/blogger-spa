@@ -147,7 +147,7 @@
   <header class="fixed top-0 left-0 right-0 z-40 nav-blur">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
-        <a href="#" @click.prevent="navigate('home')" class="text-xl font-bold text-white tracking-tight hover:text-accent transition-colors">
+        <a href="#" @click="navigate($event, 'home')" class="text-xl font-bold text-white tracking-tight hover:text-accent transition-colors">
           <span class="text-accent">&lt;</span>
           <span x-text="blogName">Blog</span>
           <span class="text-accent">/&gt;</span>
@@ -155,7 +155,7 @@
 
         <nav class="hidden md:flex items-center gap-1">
           <template x-for="pg in pages" :key="pg.id">
-            <a href="#" @click.prevent="navigate('post', pg.id, 'page')" class="px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" x-text="pg.title"></a>
+            <a :href="'#/page/' + pg.slug + '/' + pg.id" @click="navigate($event, 'post', pg.id, 'page')" class="px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" x-text="pg.title"></a>
           </template>
           <button @click="openSearch = true" class="ml-2 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" aria-label="Search">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -173,7 +173,7 @@
       <!-- Mobile menu -->
       <div x-show="mobileMenu" x-cloak x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-4" class="md:hidden pb-4 pt-2 border-t border-slate-700/40">
         <template x-for="pg in pages" :key="pg.id">
-          <a href="#" @click.prevent="navigate('post', pg.id, 'page'); mobileMenu = false" class="block px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-xl transition-colors" x-text="pg.title"></a>
+          <a :href="'#/page/' + pg.slug + '/' + pg.id" @click="navigate($event, 'post', pg.id, 'page'); mobileMenu = false" class="block px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-xl transition-colors" x-text="pg.title"></a>
         </template>
         <button @click="openSearch = true; mobileMenu = false" class="w-full text-left px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-xl transition-colors mt-1">Search</button>
       </div>
@@ -204,7 +204,7 @@
           <p class="text-slate-500 text-sm text-center py-8">No results for "<span class="text-slate-300" x-text="searchQuery"></span>"</p>
         </template>
         <template x-for="r in searchResults" :key="r.id">
-          <a href="#" @click.prevent="navigate('post', r.id); openSearch = false; searchQuery = ''" class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-700/50 transition-colors group border border-transparent hover:border-slate-700/50">
+          <a :href="'#/post/' + r.slug + '/' + r.id" @click="navigate($event, 'post', r.id); openSearch = false; searchQuery = ''" class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-700/50 transition-colors group border border-transparent hover:border-slate-700/50">
             <div class="min-w-0 flex-1">
               <p class="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors line-clamp-1" x-text="r.title"></p>
               <p class="text-xs text-slate-400 mt-0.5" x-text="stripHtml(r.summary).substring(0, 80)"></p>
@@ -271,7 +271,7 @@
           </template>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <template x-for="(post, idx) in posts" :key="post.id">
-              <article @click="navigate('post', post.id)" class="card-hover card-shine gradient-border bg-slate-800/60 rounded-2xl overflow-hidden border border-slate-700/50 cursor-pointer group flex flex-col fade-in" :style="'animation-delay: ' + (idx * 80) + 'ms'">
+              <a :href="'#/post/' + post.slug + '/' + post.id" @click="navigate($event, 'post', post.id)" role="article" class="card-hover card-shine gradient-border bg-slate-800/60 rounded-2xl overflow-hidden border border-slate-700/50 cursor-pointer group flex flex-col fade-in no-underline" :style="'animation-delay: ' + (idx * 80) + 'ms'">
                 <div class="aspect-video bg-slate-700 overflow-hidden relative">
                   <div class="skeleton absolute inset-0"></div>
                   <img x-show="post.thumbnail" :src="imgProxy(post.thumbnail)" :alt="post.title" class="relative z-10 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-0" @load="$el.classList.remove('opacity-0')" @error="fallbackImg($el)" loading="lazy" />
@@ -291,13 +291,13 @@
                     <span x-text="formatDate(post.published)"></span>
                     <template x-if="post.commentCount > 0">
                       <span class="flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                         <span x-text="post.commentCount"></span>
                       </span>
                     </template>
                   </div>
                 </div>
-              </article>
+              </a>
             </template>
           </div>
         </div>
@@ -335,7 +335,7 @@
           <article>
             <div class="flex flex-wrap gap-2 mb-4">
               <template x-for="cat in currentPost.categories" :key="cat">
-                <button @click="navigateLabel(cat)" class="tag-pill text-xs px-3 py-1 bg-slate-700/70 text-slate-300 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-emerald-400 hover:text-slate-900 rounded-full" x-text="cat"></button>
+                <a :href="'#/label/' + cat" @click="navigateLabel($event, cat)" class="tag-pill text-xs px-3 py-1 bg-slate-700/70 text-slate-300 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-emerald-400 hover:text-slate-900 rounded-full no-underline inline-block" x-text="cat"></a>
               </template>
             </div>
             <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight leading-tight">
@@ -401,7 +401,7 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <template x-for="(post, idx) in posts" :key="post.id">
-            <article @click="navigate('post', post.id)" class="card-hover card-shine gradient-border bg-slate-800/60 rounded-2xl overflow-hidden border border-slate-700/50 cursor-pointer group flex flex-col fade-in" :style="'animation-delay: ' + (idx * 80) + 'ms'">
+            <a :href="'#/post/' + post.slug + '/' + post.id" @click="navigate($event, 'post', post.id)" role="article" class="card-hover card-shine gradient-border bg-slate-800/60 rounded-2xl overflow-hidden border border-slate-700/50 cursor-pointer group flex flex-col fade-in no-underline" :style="'animation-delay: ' + (idx * 80) + 'ms'">
               <div class="aspect-video bg-slate-700 overflow-hidden relative">
                 <div class="skeleton absolute inset-0"></div>
                 <img x-show="post.thumbnail" :src="imgProxy(post.thumbnail)" :alt="post.title" class="relative z-10 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-0" @load="$el.classList.remove('opacity-0')" @error="fallbackImg($el)" loading="lazy" />
@@ -414,7 +414,7 @@
                 <p class="mt-2 text-sm text-slate-400 line-clamp-2" x-text="stripHtml(post.summary).substring(0, 150)"></p>
                 <div class="mt-3 text-xs text-slate-500" x-text="formatDate(post.published)"></div>
               </div>
-            </article>
+            </a>
           </template>
         </div>
         <template x-if="totalResults > itemsPerPage">
@@ -802,7 +802,9 @@
           }
         },
 
-        navigate(view, id, type) {
+        navigate(e, view, id, type) {
+          if (e.metaKey || e.ctrlKey || e.button === 1) return;
+          e.preventDefault();
           if (view === 'home') {
             this.fetchPosts();
           } else if (view === 'post' && id) {
@@ -815,7 +817,9 @@
           }
         },
 
-        navigateLabel(label) {
+        navigateLabel(e, label) {
+          if (e.metaKey || e.ctrlKey || e.button === 1) return;
+          e.preventDefault();
           this.currentLabel = label;
           this.fetchByLabel(label);
         },
