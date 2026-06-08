@@ -282,7 +282,7 @@
                 <div class="p-5 flex flex-col flex-1">
                   <div class="flex flex-wrap gap-1.5 mb-2">
                     <template x-for="cat in post.categories" :key="cat">
-                      <span class="tag-pill text-xs px-2.5 py-0.5 bg-slate-700/70 text-slate-300 rounded-full" x-text="cat"></span>
+                      <span @click.stop="labelClick($event, cat)" class="tag-pill text-xs px-2.5 py-0.5 bg-slate-700/70 text-slate-300 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-emerald-400 hover:text-slate-900 rounded-full cursor-pointer" x-text="cat"></span>
                     </template>
                   </div>
                   <h2 class="text-lg font-semibold text-white group-hover:text-accent transition-colors line-clamp-2 leading-snug" x-text="post.title"></h2>
@@ -820,6 +820,13 @@
         navigateLabel(e, label) {
           if (e.metaKey || e.ctrlKey || e.button === 1) return;
           e.preventDefault();
+          this.currentLabel = label;
+          this.fetchByLabel(label);
+        },
+
+        labelClick(e, label) {
+          e.stopPropagation();
+          if (e.metaKey || e.ctrlKey || e.button === 1) { window.open('#/label/' + encodeURIComponent(label), '_blank'); return; }
           this.currentLabel = label;
           this.fetchByLabel(label);
         },
