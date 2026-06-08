@@ -271,33 +271,37 @@
           </template>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <template x-for="(post, idx) in posts" :key="post.id">
-              <a :href="'#/post/' + post.slug + '/' + post.id" @click="navigate($event, 'post', post.id)" role="article" class="card-hover card-shine gradient-border bg-slate-800/60 rounded-2xl overflow-hidden border border-slate-700/50 cursor-pointer group flex flex-col fade-in no-underline" :style="'animation-delay: ' + (idx * 80) + 'ms'">
-                <div class="aspect-video bg-slate-700 overflow-hidden relative">
-                  <div class="skeleton absolute inset-0"></div>
-                  <img x-show="post.thumbnail" :src="imgProxy(post.thumbnail)" :alt="post.title" class="relative z-10 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-0" @load="$el.classList.remove('opacity-0')" @error="fallbackImg($el)" loading="lazy" />
-                  <div x-show="!post.thumbnail" class="absolute inset-0 flex items-center justify-center text-slate-600">
-                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+              <div role="article" class="card-hover card-shine gradient-border bg-slate-800/60 rounded-2xl overflow-hidden border border-slate-700/50 group flex flex-col fade-in" :style="'animation-delay: ' + (idx * 80) + 'ms'">
+                <a :href="'#/post/' + post.slug + '/' + post.id" @click="navigate($event, 'post', post.id)" class="flex flex-col flex-1 no-underline cursor-pointer">
+                  <div class="aspect-video bg-slate-700 overflow-hidden relative">
+                    <div class="skeleton absolute inset-0"></div>
+                    <img x-show="post.thumbnail" :src="imgProxy(post.thumbnail)" :alt="post.title" class="relative z-10 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-0" @load="$el.classList.remove('opacity-0')" @error="fallbackImg($el)" loading="lazy" />
+                    <div x-show="!post.thumbnail" class="absolute inset-0 flex items-center justify-center text-slate-600">
+                      <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                    </div>
                   </div>
-                </div>
-                <div class="p-5 flex flex-col flex-1">
-                  <div class="flex flex-wrap gap-1.5 mb-2">
+                  <div class="p-5 flex-1">
+                    <h2 class="text-lg font-semibold text-white group-hover:text-accent transition-colors line-clamp-2 leading-snug" x-text="post.title"></h2>
+                    <p class="mt-2 text-sm text-slate-400 line-clamp-2 flex-1" x-text="stripHtml(post.summary).substring(0, 150)"></p>
+                    <div class="mt-4 flex items-center gap-3 text-xs text-slate-500">
+                      <span x-text="formatDate(post.published)"></span>
+                      <template x-if="post.commentCount > 0">
+                        <span class="flex items-center gap-1">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                          <span x-text="post.commentCount"></span>
+                        </span>
+                      </template>
+                    </div>
+                  </div>
+                </a>
+                <template x-if="post.categories.length > 0">
+                  <div class="px-5 pb-4 flex flex-wrap gap-1.5">
                     <template x-for="cat in post.categories" :key="cat">
-                      <span @click.stop.prevent="labelClick($event, cat)" class="tag-pill text-xs px-2.5 py-0.5 bg-slate-700/70 text-slate-300 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-emerald-400 hover:text-slate-900 rounded-full cursor-pointer" x-text="cat"></span>
+                      <a :href="'#/label/' + cat" @click="navigateLabel($event, cat)" class="tag-pill text-xs px-2.5 py-0.5 bg-slate-700/70 text-slate-300 hover:bg-gradient-to-r hover:from-emerald-500 hover:to-emerald-400 hover:text-slate-900 rounded-full no-underline" x-text="cat"></a>
                     </template>
                   </div>
-                  <h2 class="text-lg font-semibold text-white group-hover:text-accent transition-colors line-clamp-2 leading-snug" x-text="post.title"></h2>
-                  <p class="mt-2 text-sm text-slate-400 line-clamp-2 flex-1" x-text="stripHtml(post.summary).substring(0, 150)"></p>
-                  <div class="mt-4 flex items-center gap-3 text-xs text-slate-500">
-                    <span x-text="formatDate(post.published)"></span>
-                    <template x-if="post.commentCount > 0">
-                      <span class="flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                        <span x-text="post.commentCount"></span>
-                      </span>
-                    </template>
-                  </div>
-                </div>
-              </a>
+                </template>
+              </div>
             </template>
           </div>
         </div>
@@ -820,14 +824,6 @@
         navigateLabel(e, label) {
           if (e.metaKey || e.ctrlKey || e.button === 1) return;
           e.preventDefault();
-          this.currentLabel = label;
-          this.fetchByLabel(label);
-        },
-
-        labelClick(e, label) {
-          e.preventDefault();
-          e.stopPropagation();
-          if (e.metaKey || e.ctrlKey || e.button === 1) { window.open('#/label/' + label, '_blank'); return; }
           this.currentLabel = label;
           this.fetchByLabel(label);
         },
